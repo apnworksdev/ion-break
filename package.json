@@ -23,8 +23,5 @@
   "devDependencies": {
     "concurrently": "^9.1.0"
   },
-  "type": "module",
-  "dependencies": {
-    "astro-swiper": "^1.3.0"
-  }
+  "type": "module"
 }
