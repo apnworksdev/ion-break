@@ -1,0 +1,10 @@
+:root {
+  --background-color: #000;
+  --foreground-color: #fff;
+  --green-color: #14FF00;
+  --font-family-impact: 'Impact MT Std', serif;
+  --font-weight-impact: bold;
+  --font-family-lab-grotesque-mono: 'Lab Grotesque Mono', monospace;
+  --font-weight-lab-grotesque-mono: normal;
+  --font-size-large: max(3.4vh, 30px);
+}

@@ -1,0 +1,171 @@
+.landing-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.landing-face-container {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  pointer-events: none;
+}
+
+.landing-face-image {
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.landing-hands-container {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.landing-hands-image {
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.landing-links-container {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: none;
+}
+
+.landing-links-item {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.landing-link-link {
+  display: contents;
+}
+
+.landing-link-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.landing-link-text {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-family: 'Impact MT Std', serif;
+  font-weight: bold;
+  font-size: max(3.4vh, 30px);
+  color: #14FF00;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.landing-links-item.game {
+  height: 55%;
+  bottom: 15%;
+  left: calc(50% - 27vh);
+  transform: translateX(-50%);
+}
+
+.landing-links-item.game .landing-link-text {
+  top: 7%;
+  left: -9vh;
+  transform: rotate(-6deg);
+}
+
+.landing-links-item.tastes {
+  height: 52%;
+  bottom: 12%;
+  left: calc(50% + 10vh);
+  transform: translateX(-50%);
+}
+
+.landing-links-item.tastes .landing-link-text {
+  top: 17%;
+  left: 1.5vh;
+  transform: rotate(-21deg);
+}
+
+.landing-links-item.video {
+  height: 44%;
+  bottom: 25%;
+  left: calc(50% + 39vh);
+  transform: translateX(-50%) rotate(23deg);
+}
+
+.landing-links-item.video .landing-link-text {
+  top: -2%;
+}
+
+/* Link needs a box so the canvas overlay can be positioned */
+.landing-links-item .landing-link-link.landing-link-alpha-hit {
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+/* Canvas overlay: same size as img, used only for alpha hit-testing */
+.landing-links-item .landing-link-hitcanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: auto;
+  cursor: default;
+}
+
+/* Cursor follows “winner” (topmost opaque icon) via parent class, so overlapping icons work */
+.landing-links-container.is-over-icon .landing-link-hitcanvas {
+  cursor: pointer;
+}
+
+/* Promote to own layer so filter paint doesn’t block; keeps border snappy */
+.landing-links-item .landing-link-image {
+  will-change: filter;
+  transform: translateZ(0);
+}
+
+/* Border on hover/focus: 2 layers for minimal paint cost */
+.landing-links-item .landing-link-link.is-over-icon .landing-link-image,
+.landing-links-item .landing-link-link:focus-visible .landing-link-image {
+  filter:
+    drop-shadow(0 0 16px rgba(21, 255, 0, 1))
+}
+
+.landing-links-item .landing-link-link.is-over-icon .landing-link-text,
+.landing-links-item .landing-link-link:focus-visible .landing-link-text {
+  display: block;
+}

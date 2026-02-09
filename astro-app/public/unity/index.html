@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <!-- Mobile-friendly: no orientation lock, allow portrait -->
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1, viewport-fit=cover"
+    />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="mobile-web-app-capable" content="yes" />
+
+    <title>NMR</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
+    <link rel="stylesheet" href="TemplateData/style.css" />
+  </head>
+
+  <body>
+    <div id="unity-container">
+      <div id="loading-screen">
+        <div class="loading-background"></div>
+
+        <img
+          src="TemplateData/loading-bar-bg.png"
+          class="loading-bar-bg"
+          alt="Loading Bar Background"
+        />
+
+        <div class="loading-bar-container">
+          <img
+            id="loading-fill"
+            src="TemplateData/scribble-fill.png"
+            class="loading-fill"
+            alt="Loading Fill"
+          />
+          <img
+            id="loading-handle"
+            src="TemplateData/scribble-handle.png"
+            class="loading-handle"
+            alt="Loading Handle"
+          />
+        </div>
+      </div>
+
+      <!-- iOS orientation / toolbar helpers -->
+      <div id="ios-rotate-overlay" class="ios-overlay" style="display:none;">
+        <div class="ios-overlay-card">
+          <div class="ios-overlay-title">Rotate your iPhone</div>
+          <div class="ios-overlay-body">
+            This experience works best in <b>landscape</b>.<br />
+            Please rotate your phone to continue.
+          </div>
+        </div>
+      </div>
+
+      <div id="ios-toolbar-overlay" class="ios-overlay ios-overlay--tap" style="display:none;">
+        <div class="ios-overlay-card">
+          <div class="ios-overlay-title">Minimise your Toolbar</div>
+          <div class="ios-overlay-body">
+            For the best experience, minimise your browser’s toolbar in the browser settings.<br /><br />
+            Tap anywhere to continue.
+          </div>
+        </div>
+      </div>
+
+      <canvas id="unity-canvas" style="display: none;"></canvas>
+    </div>
+
+    <script>
+  // --- UNITY CONSOLE FILTER -------------------------------
+  (function () {
+    const _warn = console.warn.bind(console);
+    const _error = console.error.bind(console);
+    const _log = console.log.bind(console);
+
+    const SUPPRESS = [
+      "BoxCollider does not support negative scale or size",
+      "Trying to get length of sound which is not loaded yet",
+      "Setting linear velocity of a kinematic body is not supported",
+      "Setting angular velocity of a kinematic body is not supported",
+    ];
+
+    function shouldSuppress(args) {
+      const text = args.map(a => (a == null ? "" : String(a))).join(" ");
+      return SUPPRESS.some(p => text.includes(p));
+    }
+
+    console.warn = (...args) => { if (!shouldSuppress(args)) _warn(...args); };
+    console.error = (...args) => { if (!shouldSuppress(args)) _error(...args); };
+    console.log = (...args) => { if (!shouldSuppress(args)) _log(...args); };
+  })();
+  // -------------------------------------------------------------------------
+      const canvas = document.querySelector("#unity-canvas");
+      const loadingScreen = document.querySelector("#loading-screen");
+      const loadingFill = document.querySelector("#loading-fill");
+      const loadingHandle = document.querySelector("#loading-handle");
+
+      const buildUrl = "Build";
+      const loaderUrl = buildUrl + "/FINAL 03.loader.js";
+      const config = {
+        dataUrl: buildUrl + "/FINAL 03.data.unityweb",
+        frameworkUrl: buildUrl + "/FINAL 03.framework.js.unityweb",
+        codeUrl: buildUrl + "/FINAL 03.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "GetSomeSleep",
+        productName: "NMR",
+        productVersion: "0.1",
+      };
+
+      // Mobile sizing tweaks (optional but helps)
+      const isMobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+      if (isMobile) {
+        // Let Unity use the actual device DPR (sharper). iOS may still clamp internally.
+        config.devicePixelRatio = window.devicePixelRatio || 1;
+        canvas.style.width = "100%";
+        canvas.style.height = "100%";
+      }
+
+      function updateLoadingProgress(progress) {
+        const p = Math.max(0, Math.min(1, progress));
+        const percent = p * 100;
+        if (loadingFill) loadingFill.style.width = percent + "%";
+        if (loadingHandle) loadingHandle.style.left = percent + "%";
+      }
+
+      function showGame() {
+        if (loadingScreen) loadingScreen.style.display = "none";
+        if (canvas) canvas.style.display = "block";
+      }
+
+      // --- iOS landscape gating -------------------------------------------------
+      const rotateOverlay = document.querySelector("#ios-rotate-overlay");
+      const toolbarOverlay = document.querySelector("#ios-toolbar-overlay");
+
+      function isIOSMobileDevice() {
+        const ua = navigator.userAgent || "";
+        const platform = navigator.platform || "";
+        const isAppleMobileUA = /iPhone|iPad|iPod/i.test(ua);
+
+        // iPadOS 13+ can identify as Mac; detect via touch points
+        const isIPadOS =
+          platform === "MacIntel" &&
+          typeof navigator.maxTouchPoints === "number" &&
+          navigator.maxTouchPoints > 1;
+
+        return isAppleMobileUA || isIPadOS;
+      }
+
+      function isLandscape() {
+        // matchMedia is best when available; fall back to viewport ratio
+        return (
+          (window.matchMedia && window.matchMedia("(orientation: landscape)").matches) ||
+          window.innerWidth > window.innerHeight
+        );
+      }
+
+      let unityLoadStarted = false;
+      let didPostLandscapeResize = false;
+
+      function startUnityLoad() {
+        if (unityLoadStarted) return;
+        unityLoadStarted = true;
+
+        const script = document.createElement("script");
+        script.src = loaderUrl;
+
+        script.onload = () => {
+          createUnityInstance(canvas, config, (progress) => {
+            updateLoadingProgress(progress);
+          })
+            .then((instance) => {
+              window.unityInstance = instance;
+              showGame();
+            })
+            .catch((message) => {
+              alert(message);
+              console.error(message);
+            });
+        };
+
+        script.onerror = () => {
+          alert("Failed to load Unity loader script: " + loaderUrl);
+          console.error("Failed to load:", loaderUrl);
+        };
+
+        document.body.appendChild(script);
+      }
+
+      function showRotateOverlay(show) {
+        if (!rotateOverlay) return;
+        rotateOverlay.style.display = show ? "flex" : "none";
+      }
+
+      function showToolbarOverlay(show) {
+        if (!toolbarOverlay) return;
+        toolbarOverlay.style.display = show ? "flex" : "none";
+      }
+
+      // --- iOS Audio Unlock -----------------------------------------------------
+      let audioUnlocked = false;
+
+      function tryUnlockIOSAudio() {
+        if (audioUnlocked) return;
+
+        let resumed = false;
+
+        try {
+          const ctx =
+            (window.unityInstance &&
+              window.unityInstance.Module &&
+              window.unityInstance.Module.audioContext) ||
+            (window.Module && window.Module.audioContext);
+
+          if (ctx && ctx.state === "suspended" && typeof ctx.resume === "function") {
+            ctx.resume();
+            resumed = true;
+          } else if (ctx && ctx.state === "running") {
+            resumed = true;
+          }
+        } catch (e) {
+          // silently ignore
+        }
+
+        if (resumed) audioUnlocked = true;
+      }
+
+      // Fallback: first user interaction anywhere unlocks audio (iOS Safari)
+      document.addEventListener(
+        "touchstart",
+        () => {
+          if (isIOSMobileDevice()) tryUnlockIOSAudio();
+        },
+        { passive: true, once: true }
+      );
+      document.addEventListener(
+        "pointerdown",
+        () => {
+          if (isIOSMobileDevice()) tryUnlockIOSAudio();
+        },
+        { passive: true, once: true }
+      );
+
+      // Tap anywhere to dismiss toolbar overlay (also unlocks iOS audio)
+      if (toolbarOverlay) {
+        const onTap = () => {
+          tryUnlockIOSAudio(); // silent unlock
+          showToolbarOverlay(false);
+        };
+
+        toolbarOverlay.addEventListener("pointerdown", onTap, { passive: true });
+        toolbarOverlay.addEventListener("touchstart", onTap, { passive: true });
+        toolbarOverlay.addEventListener("mousedown", onTap);
+      }
+      // --------------------------------------------------------------------------
+
+      function handleIOSGating() {
+        const ios = isIOSMobileDevice();
+
+        if (!ios) {
+          // Non-iOS: behave exactly like before
+          startUnityLoad();
+          return;
+        }
+
+        if (!isLandscape()) {
+          // iOS portrait: freeze (do not start Unity load) and prompt rotate
+          showRotateOverlay(true);
+          showToolbarOverlay(false);
+          didPostLandscapeResize = false;
+          return;
+        }
+
+        // iOS landscape: start loading and show toolbar hint (dismiss on tap)
+        showRotateOverlay(false);
+        startUnityLoad();
+        showToolbarOverlay(true);
+
+        // iOS Safari can report unstable viewport sizes right after rotation / toolbar changes
+        // Throttle so we don't create a resize->dispatch->resize loop.
+        if (!didPostLandscapeResize) {
+          didPostLandscapeResize = true;
+          setTimeout(() => window.dispatchEvent(new Event("resize")), 300);
+        }
+      }
+
+      // Run once, then keep watching for orientation changes
+      handleIOSGating();
+      window.addEventListener("resize", handleIOSGating, { passive: true });
+      window.addEventListener("orientationchange", handleIOSGating, { passive: true });
+      // --------------------------------------------------------------------------
+    </script>
+  </body>
+</html>

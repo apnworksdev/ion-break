@@ -1,0 +1,8 @@
+# Cache for Astro assets (optional; Netlify may already set this via UI)
+/_astro/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unity WebGL Build: serve pre-compressed Brotli with correct encoding
+# so the browser decompresses them and startup time is reduced.
+/unity/Build/*.unityweb
+  Content-Encoding: br

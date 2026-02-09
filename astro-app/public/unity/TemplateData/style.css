@@ -1,0 +1,133 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+}
+
+#unity-container {
+  position: fixed;
+  inset: 0;
+}
+
+#unity-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+#loading-screen {
+  position: fixed;
+  inset: 0;
+  background: #000;
+}
+
+.loading-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('loading-background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.loading-bar-bg {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  transform: translate(-50%, -50%);
+  width: 63vh;
+  max-width: 95%;
+  height: auto;
+  object-fit: contain;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.loading-bar-container {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  transform: translate(-50%, -50%);
+  height: 7vh;
+  width: 57.31vh;
+  max-width: 90%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.loading-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0%;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+  transition: width 0.2s ease;
+  z-index: 2;
+}
+
+.loading-handle {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  height: 93.42%;
+  width: auto;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+  transition: left 0.2s ease;
+  z-index: 3;
+  pointer-events: none;
+}
+
+
+/* iOS overlays (orientation + toolbar hint) */
+.ios-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9999;
+  text-align: center;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.ios-overlay-card {
+  max-width: 520px;
+  width: 100%;
+  padding: 18px 16px;
+  border-radius: 14px;
+  background: rgba(20, 20, 20, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.ios-overlay-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.ios-overlay-body {
+  font-size: 14px;
+  line-height: 1.35;
+  opacity: 0.95;
+}
+
+.ios-overlay--tap {
+  cursor: pointer;
+}

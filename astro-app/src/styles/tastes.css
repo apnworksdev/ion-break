@@ -1,0 +1,121 @@
+.tastes-page {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.tastes-page-background-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.tastes-page-background-image {
+  width: auto;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.tastes-page .swiper {
+  position: fixed;
+  width: 100vw;
+  height: 100dvh;
+  padding-top: 75px;
+}
+
+.tastes-page .swiper-slide {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.tastes-page .swiper-slide:not(.swiper-slide-active) {
+  filter: blur(5px);
+}
+
+.tastes-page .swiper-button-next svg,
+.tastes-page .swiper-button-prev svg,
+.tastes-page .swiper-navigation-icon {
+  display: none;
+}
+
+.tastes-page .swiper-button-prev,
+.tastes-page .swiper-button-next {
+  position: absolute;
+  height: 48px;
+  width: 19px;
+  background: transparent;
+  display: block;
+  cursor: pointer;
+  z-index: 10;
+  --swiper-navigation-sides-offset: 23px;
+}
+
+.tastes-page .swiper-button-prev,
+.tastes-page .swiper-button-next {
+  color: var(--foreground-color);
+}
+
+@media(hover: hover) {
+  .tastes-page .swiper-button-prev:hover,
+  .tastes-page .swiper-button-next:hover {
+    color: var(--green-color);
+  }
+}
+
+.tastes-page .swiper-button-prev::before,
+.tastes-page .swiper-button-prev::after,
+.tastes-page .swiper-button-next::before,
+.tastes-page .swiper-button-next::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  height: 50%;
+  width: 100%;
+}
+
+.tastes-page .swiper-button-prev::before,
+.tastes-page .swiper-button-next::after {
+  clip-path: polygon(100% 0%, 100% 50%, 0% 100%, 0% 50%);
+}
+
+.tastes-page .swiper-button-prev::after,
+.tastes-page .swiper-button-next::before {
+  clip-path: polygon(100% 50%, 100% 100%, 0% 50%, 0% 0%);
+}
+
+.tastes-page .swiper-button-prev::after,
+.tastes-page .swiper-button-next::after {
+  top: 50%;
+}
+
+.back-button {
+  position: fixed;
+  top: 20px;
+  left: 23px;
+  z-index: 10;
+  cursor: pointer;
+}
+
+.back-button-text {
+  font-family: var(--font-family-impact);
+  font-weight: bold;
+  font-size: var(--font-size-large);
+  color: var(--foreground-color);
+  text-transform: uppercase;
+}
+
+@media(hover: hover) {
+  .back-button:hover .back-button-text {
+    color: var(--green-color);
+  }
+}

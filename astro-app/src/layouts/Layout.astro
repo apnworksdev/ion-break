@@ -1,6 +1,6 @@
 ---
 import { ViewTransitions } from 'astro:transitions';
-import { getBackgroundVideo } from '../utils/sanity';
+import '../styles/variables.css';
 import '../styles/global.css';
 import '../styles/main.css';
 
@@ -9,7 +9,6 @@ interface Props {
 }
 
 const { title } = Astro.props;
-const backgroundVideo = await getBackgroundVideo();
 ---
 
 <!DOCTYPE html>
@@ -40,47 +39,13 @@ const backgroundVideo = await getBackgroundVideo();
       transition:persist="logo"
     >
       <img
-        src="/img/logo.png"
+        src="/img/logo-metallic.png"
         alt="Sanity Logo"
         id="logo"
       />
     </a>
-    
     <main>
-      <div id="background-container" transition:persist="bg-video">
-        {backgroundVideo && (backgroundVideo.videoFile || backgroundVideo.videoUrl) && (
-          <video
-            id="background-video"
-            autoplay
-            loop
-            muted
-            playsinline
-            poster={backgroundVideo.posterImage}
-          >
-            <source src={backgroundVideo.videoUrl || backgroundVideo.videoFile} type="video/mp4" />
-          </video>
-        )}
-      </div>
       <slot />
     </main>
   </body>
 </html>
-
-<style is:global>
-  #background-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: -1;
-    opacity: .38;
-  }
-
-  #background-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-</style>

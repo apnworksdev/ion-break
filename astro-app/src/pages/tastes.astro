@@ -3,20 +3,16 @@ import Card from "../components/Card.astro";
 import Layout from "../layouts/Layout.astro";
 import { getTastes } from "../utils/sanity";
 import { Swiper, SwiperWrapper, SwiperSlide } from "astro-swiper";
+import "../styles/tastes.css";
 
 const tastes = await getTastes();
 ---
 
 <Layout title="Products - ION Break">
-  <a href="/video" id="clip-button" class="glass-button">
-    <img
-      src="/img/Button_Clip.png"
-      alt="Watch the full clip"
-      id="clip-button-img"
-    />
-  </a>
-
-  <section>
+  <div class="tastes-page">
+    <div class="tastes-page-background-container">
+      <img src="/img/tastes-background-desktop.png" alt="ION Break" class="tastes-page-background-image" />
+    </div>
     <Swiper
       options={{
         loop: true,
@@ -47,40 +43,20 @@ const tastes = await getTastes();
       </SwiperWrapper>
 
       <div class="swiper-button-prev">
-        <img
-          src="/img/Button_Arrow_Prev.png"
-          alt="Arrow Prev"
-          class="arrow-prev-img"
-        />
       </div>
-
       <div class="swiper-button-next">
-        <img
-          src="/img/Button_Arrow_Next.png"
-          alt="Arrow Next"
-          class="arrow-next-img"
-        />
       </div>
 
-      <img
-        src="/img/ION_Tag.png"
-        alt="ION"
-        id="ion-tag"
-      />
-
-      <img
-        src="/img/Break_Tag.png"
-        alt="Break"
-        id="break-tag"
-      />
     </Swiper>
-  </section>
-
+    <a href="/" class="back-button">
+      <span class="back-button-text">Close</span>
+    </a>
+  </div>
 </Layout>
 
 <script type="module" src="https://cdn.jsdelivr.net/npm/hover-tilt/dist/hover-tilt.js" is:inline></script>
 
-<style>
+<!-- <style>
   #clip-button {
     position: fixed;
     top: 0;
@@ -213,4 +189,4 @@ const tastes = await getTastes();
       transform: rotate(-10deg) scale(1);
     }
   }
-</style>
+</style> -->

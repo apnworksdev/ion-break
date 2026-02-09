@@ -102,22 +102,3 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px var(--background-color) inset !important;
 }
-
-/* ------------------------------------------------------------ */
-
-/*                       UTILITY CLASSES                        */
-
-/* ------------------------------------------------------------ */
-
-.uppercase {
-  text-transform: uppercase;
-}
-
-.display {
-  font-family: 'Acumin Variable', sans-serif;
-  font-variation-settings: 'wght' 900, 'wdth' 50, 'slnt' 0;
-}
-
-.mono {
-  font-family: 'Lab Grotesque Mono', monospace;
-}
