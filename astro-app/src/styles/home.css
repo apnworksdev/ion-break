@@ -89,23 +89,64 @@
 
 .landing-links-item {
   position: fixed;
-  pointer-events: auto;
+  pointer-events: none;
 }
 
 .landing-link-link {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+}
+
+.landing-links-item.game .landing-link-link {
+  -webkit-clip-path: polygon( 8.184% 22.67%,10.381% 19.009%,58.462% 13.737%,91.492% 74.363%,88.319% 77.439%,38.53% 90.399%,8.184% 22.67% );
+  clip-path: polygon( 8.184% 22.67%,10.381% 19.009%,58.462% 13.737%,91.492% 74.363%,88.319% 77.439%,38.53% 90.399%,8.184% 22.67% );
+}
+
+.landing-links-item.tastes .landing-link-link {
+  -webkit-clip-path: polygon( 43.261% 31.445%,18.533% 22.797%,7.039% 70.685%,44.48% 83.008%,49.792% 87.657%,52.665% 87.657%,54.494% 79.009%,92.893% 59.875%,77.307% 13.068%,43.261% 31.445% );
+  clip-path: polygon( 43.261% 31.445%,18.533% 22.797%,7.039% 70.685%,44.48% 83.008%,49.792% 87.657%,52.665% 87.657%,54.494% 79.009%,92.893% 59.875%,77.307% 13.068%,43.261% 31.445% );
+}
+
+.landing-links-item.video .landing-link-link {
+  -webkit-clip-path: polygon( 21.141% 82.433%,21.141% 9.679%,78.646% 9.679%,78.646% 82.433%,21.141% 82.433% );
+  clip-path: polygon( 21.141% 82.433%,21.141% 9.679%,78.646% 9.679%,78.646% 82.433%,21.141% 82.433% );
+}
+
+@media (aspect-ratio <= 1/1) {
+  .landing-links-item.video .landing-link-link {
+    -webkit-clip-path: polygon( 15.129% 82.287%,16.073% 9.933%,54.615% 9.933%,96.459% 43.493%,88.28% 65.508%,57.761% 52.352%,56.66% 82.287%,15.129% 82.287% );
+    clip-path: polygon( 15.129% 82.287%,16.073% 9.933%,54.615% 9.933%,96.459% 43.493%,88.28% 65.508%,57.761% 52.352%,56.66% 82.287%,15.129% 82.287% );
+  }
+}
+
+.landing-link-image-container {
   display: contents;
 }
 
 .landing-link-image {
   width: auto;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
+  pointer-events: none;
+  transition: filter var(--transition-time) var(--transition-effect);
+}
+
+@media (hover: hover) {
+  .landing-link-link:hover + .landing-link-image-container .landing-link-text {
+    opacity: 1;
+  }
+
+  .landing-link-link:hover + .landing-link-image-container .landing-link-image {
+    filter: drop-shadow(0 0 16px rgba(21, 255, 0, 1));
+  }
 }
 
 .landing-link-text {
   opacity: 0;
   position: absolute;
+  z-index: 1;
   top: 0;
   left: 0;
   width: 100%;
@@ -192,27 +233,7 @@
   }
 }
 
-.landing-links-item .landing-link-link.landing-link-alpha-hit {
-  display: block;
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
-
-.landing-links-item .landing-link-hitcanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: auto;
-  cursor: default;
-}
-
-.landing-links-container.is-over-icon .landing-link-hitcanvas {
-  cursor: pointer;
-}
-
-.landing-links-item .landing-link-image {
+/* .landing-links-item .landing-link-image {
   will-change: filter;
   transform: translateZ(0);
   transition: filter var(--transition-time) var(--transition-effect);
@@ -220,11 +241,10 @@
 
 .landing-links-item .landing-link-link.is-over-icon .landing-link-image,
 .landing-links-item .landing-link-link:focus-visible .landing-link-image {
-  filter:
-    drop-shadow(0 0 16px rgba(21, 255, 0, 1))
+  filter: drop-shadow(0 0 16px rgba(21, 255, 0, 1));
 }
 
 .landing-links-item .landing-link-link.is-over-icon .landing-link-text,
 .landing-links-item .landing-link-link:focus-visible .landing-link-text {
   opacity: 1;
-}
+} */

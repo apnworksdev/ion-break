@@ -29,7 +29,10 @@ export const prerender = true;
     </div>
     <div class="landing-links-container">
       <div class="landing-links-item game">
-        <a href="/game" class="landing-link-link landing-link-alpha-hit">
+        <a href="/game" class="landing-link-link landing-link-hit">
+        </a>
+        <div class="landing-link-image-container">
+          <p class="landing-link-text">Play the game</p>
           <AppImage
             src={gameIcon}
             alt="Play game"
@@ -38,14 +41,14 @@ export const prerender = true;
             height={800}
             quality="high"
             fetchpriority="high"
-            data-alpha-hit
           />
-          <canvas class="landing-link-hitcanvas" aria-hidden="true"></canvas>
-          <p class="landing-link-text">Play the game</p>
-        </a>
+        </div>
       </div>
       <div class="landing-links-item tastes">
-        <a href="/tastes" class="landing-link-link landing-link-alpha-hit">
+        <a href="/tastes" class="landing-link-link landing-link-hit">
+        </a>
+        <div class="landing-link-image-container">
+          <p class="landing-link-text">Tastes/Fillings</p>
           <AppImage
             src={tastesIcon}
             alt="Tastes"
@@ -54,14 +57,14 @@ export const prerender = true;
             height={800}
             quality="high"
             fetchpriority="high"
-            data-alpha-hit
           />
-          <canvas class="landing-link-hitcanvas" aria-hidden="true"></canvas>
-          <p class="landing-link-text">Tastes/Fillings</p>
-        </a>
+        </div>
       </div>
       <div class="landing-links-item video">
-        <a href="/video" class="landing-link-link landing-link-alpha-hit">
+        <a href="/video" class="landing-link-link landing-link-hit">
+        </a>
+        <div class="landing-link-image-container">
+          <p class="landing-link-text">Watch the clip</p>
           <AppImage
             src={phoneIcon}
             mobileSrc={mobilePhoneIcon}
@@ -71,11 +74,8 @@ export const prerender = true;
             height={800}
             quality="high"
             fetchpriority="high"
-            data-alpha-hit
           />
-          <canvas class="landing-link-hitcanvas" aria-hidden="true"></canvas>
-          <p class="landing-link-text">Watch the clip</p>
-        </a>
+        </div>
       </div>
     </div>
     <div class="landing-hands-container">
@@ -92,171 +92,3 @@ export const prerender = true;
     </div>
   </div>
 </Layout>
-
-<script>
-  type AlphaHitLink = HTMLAnchorElement & {
-    __alphaHitCheck?: (screenX: number, screenY: number) => boolean;
-  };
-
-  let currentAlphaHitLinks: AlphaHitLink[] = [];
-  let currentLinksContainer: Element | null = null;
-  let lastWinner: AlphaHitLink | null = null;
-
-  document.addEventListener("astro:page-load", initAlphaHit);
-
-  function initAlphaHit() {
-    const alphaHitLinks = Array.from(
-      document.querySelectorAll<AlphaHitLink>(".landing-link-alpha-hit"),
-    );
-    if (alphaHitLinks.length === 0) return;
-
-    currentAlphaHitLinks = alphaHitLinks;
-    currentLinksContainer = document.querySelector(".landing-links-container");
-    lastWinner = null;
-    alphaHitLinks.forEach(setupAlphaHit);
-  }
-
-  function handleAlphaHitClick(e: MouseEvent) {
-    const link = (e.target as Element).closest(".landing-link-alpha-hit");
-    if (!link) return;
-    const winner = getTopmostOpaqueLinkAt(e.clientX, e.clientY);
-    if (winner !== link) {
-      e.preventDefault();
-      if (winner) window.location.href = winner.href;
-    }
-  }
-
-  function handleAlphaHitMousemove(e: MouseEvent) {
-    const winner = getTopmostOpaqueLinkAt(e.clientX, e.clientY);
-    if (winner === lastWinner) return;
-    lastWinner = winner;
-    currentAlphaHitLinks.forEach((link) =>
-      link.classList.toggle("is-over-icon", link === winner),
-    );
-    currentLinksContainer?.classList.toggle("is-over-icon", winner !== null);
-  }
-
-  function getTopmostOpaqueLinkAt(
-    screenX: number,
-    screenY: number,
-  ): AlphaHitLink | null {
-    const elements = document.elementsFromPoint(screenX, screenY);
-    for (const el of elements) {
-      if (!el.classList?.contains("landing-link-hitcanvas")) continue;
-      const link = el.closest("a") as AlphaHitLink | null;
-      if (!link?.__alphaHitCheck) continue;
-      if (link.__alphaHitCheck(screenX, screenY)) return link;
-    }
-    return null;
-  }
-
-  function setupAlphaHit(el: HTMLAnchorElement) {
-    const img = el.querySelector<HTMLImageElement>(
-      ".landing-link-image[data-alpha-hit]",
-    );
-    const canvas = el.querySelector<HTMLCanvasElement>(
-      ".landing-link-hitcanvas",
-    );
-    if (!img || !canvas) return;
-
-    const ALPHA_THRESHOLD = 10;
-    let offscreen: HTMLCanvasElement | null = null;
-    let offscreenCtx: CanvasRenderingContext2D | null = null;
-    let imageLoaded = false;
-
-    function getMaxAlphaNear(
-      displayX: number,
-      displayY: number,
-      displayW: number,
-      displayH: number,
-    ): number | null {
-      if (!offscreen || !offscreenCtx || !imageLoaded) return null;
-      const scaleX = offscreen.width / displayW;
-      const scaleY = offscreen.height / displayH;
-      const cx = Math.floor(displayX * scaleX);
-      const cy = Math.floor(displayY * scaleY);
-      const x = Math.max(0, cx - 1);
-      const y = Math.max(0, cy - 1);
-      const w = Math.min(3, offscreen.width - x);
-      const h = Math.min(3, offscreen.height - y);
-      if (w < 1 || h < 1) return 0;
-      try {
-        const data = offscreenCtx.getImageData(x, y, w, h).data;
-        let maxAlpha = 0;
-        for (let i = 3; i < data.length; i += 4) {
-          if (data[i] > maxAlpha) maxAlpha = data[i];
-        }
-        return maxAlpha;
-      } catch {
-        return null;
-      }
-    }
-
-    function isOverIcon(x: number, y: number, w: number, h: number): boolean {
-      const maxAlpha = getMaxAlphaNear(x, y, w, h);
-      if (maxAlpha === null) return true;
-      return maxAlpha > ALPHA_THRESHOLD;
-    }
-
-    const ALPHA_MAP_SIZE = 128;
-
-    function initOffscreen() {
-      if (!img || img.naturalWidth === 0 || img.naturalHeight === 0) {
-        imageLoaded = true;
-        return;
-      }
-      const c = document.createElement("canvas");
-      const nw = img.naturalWidth;
-      const nh = img.naturalHeight;
-      const scale = Math.min(ALPHA_MAP_SIZE / nw, ALPHA_MAP_SIZE / nh, 1);
-      c.width = Math.max(1, Math.round(nw * scale));
-      c.height = Math.max(1, Math.round(nh * scale));
-      const ctx = c.getContext("2d", { willReadFrequently: true });
-      if (ctx) {
-        try {
-          ctx.drawImage(img, 0, 0, nw, nh, 0, 0, c.width, c.height);
-          offscreen = c;
-          offscreenCtx = ctx;
-          ctx.getImageData(0, 0, 1, 1);
-        } catch {
-          /* tainted canvas */
-        }
-      }
-      imageLoaded = true;
-    }
-
-    img
-      .decode()
-      .then(initOffscreen)
-      .catch(() => {
-        imageLoaded = true;
-        img.addEventListener("load", initOffscreen, { once: true });
-      });
-
-    /** Check from screen coords; used when resolving topmost opaque link over overlapping icons. */
-    (el as AlphaHitLink).__alphaHitCheck = (
-      screenX: number,
-      screenY: number,
-    ) => {
-      const rect = canvas.getBoundingClientRect();
-      if (
-        screenX < rect.left ||
-        screenX >= rect.right ||
-        screenY < rect.top ||
-        screenY >= rect.bottom
-      )
-        return false;
-      return isOverIcon(
-        screenX - rect.left,
-        screenY - rect.top,
-        rect.width,
-        rect.height,
-      );
-    };
-  }
-
-  document.addEventListener("click", handleAlphaHitClick, true);
-  document.addEventListener("mousemove", handleAlphaHitMousemove);
-
-  initAlphaHit();
-</script>
