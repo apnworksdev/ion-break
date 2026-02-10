@@ -2,8 +2,8 @@
 /**
  * Wrapper around Astro's Picture (and getImage when mobile). Use everywhere for a single API.
  *
- * - Always uses one <picture>: avif + webp for desktop (and optional mobile source first).
- * - With mobileSrc/mobileSrcSet: adds <source media="(max-width: 820px)"> so mobile gets its own image.
+ * - With mobileSrc/mobileSrcSet: uses one <picture> with mobile source at (max-width: 820px), then avif + webp for desktop, then img fallback.
+ * - Mobile ImageMetadata is passed through getImage() so the built URL is correct (same as desktop).
  * - Wrapper has data-app-image for fade-in and reveal-when-ready.
  */
 import { getImage, Picture } from "astro:assets";
@@ -46,12 +46,27 @@ const hasMobile = mobileSrc ?? mobileSrcSet;
 const breakpoint = "(aspect-ratio <= 1/1)";
 const castSrc = src as ImageMetadata & string;
 
-// srcset must be a URL string; resolve ImageMetadata to .src
-const mobileSrcUrl =
-  mobileSrcSet ??
-  (typeof mobileSrc === "string" ? mobileSrc : (mobileSrc as ImageMetadata)?.src ?? "");
+// Resolve mobile URL: use getImage for ImageMetadata so we get the built URL; string stays as-is.
+let mobileSrcUrl = mobileSrcSet ?? "";
+if (!mobileSrcUrl && mobileSrc) {
+  if (typeof mobileSrc === "string") {
+    mobileSrcUrl = mobileSrc;
+  } else {
+    try {
+      const mobileImg = await getImage({
+        src: mobileSrc as ImageMetadata,
+        width,
+        height,
+        ...(quality != null && { quality }),
+      });
+      mobileSrcUrl = mobileImg.src;
+    } catch {
+      mobileSrcUrl = (mobileSrc as ImageMetadata)?.src ?? "";
+    }
+  }
+}
 
-// When we have a mobile image, build one <picture> with: mobile source + (avif + webp for desktop) + img
+// When we have a mobile image, build one <picture>: mobile source + (avif + webp for desktop) + img fallback.
 let desktopAvif: string | undefined;
 let desktopWebp: string | undefined;
 const initialFallback =
@@ -64,7 +79,7 @@ if (hasMobile) {
     const [avif, webp, fallback] = await Promise.all([
       getImage({ ...baseOpts, format: "avif" }),
       getImage({ ...baseOpts, format: "webp" }),
-      getImage({ src: castSrc, width, height, ...(quality != null && { quality }) }),
+      getImage({ ...baseOpts, format: "png" }),
     ]);
     desktopAvif = avif.src;
     desktopWebp = webp.src;
@@ -86,6 +101,7 @@ const useCustomPicture = hasMobile;
       {desktopAvif && <source type="image/avif" srcset={desktopAvif} />}
       {desktopWebp && <source type="image/webp" srcset={desktopWebp} />}
       <img
+        {...rest}
         src={desktopFallback}
         alt={alt}
         width={width}
@@ -94,7 +110,6 @@ const useCustomPicture = hasMobile;
         loading={loading}
         fetchpriority={fetchpriority}
         decoding={decoding}
-        {...rest}
       />
     </picture>
   ) : (

@@ -94,7 +94,9 @@ export const prerender = true;
 </Layout>
 
 <script>
-  type AlphaHitLink = HTMLAnchorElement & { __alphaHitCheck?: (screenX: number, screenY: number) => boolean };
+  type AlphaHitLink = HTMLAnchorElement & {
+    __alphaHitCheck?: (screenX: number, screenY: number) => boolean;
+  };
 
   let currentAlphaHitLinks: AlphaHitLink[] = [];
   let currentLinksContainer: Element | null = null;
@@ -103,34 +105,41 @@ export const prerender = true;
   document.addEventListener("astro:page-load", initAlphaHit);
 
   function initAlphaHit() {
-    const alphaHitLinks = Array.from(document.querySelectorAll<AlphaHitLink>(".landing-link-alpha-hit"));
+    const alphaHitLinks = Array.from(
+      document.querySelectorAll<AlphaHitLink>(".landing-link-alpha-hit"),
+    );
     if (alphaHitLinks.length === 0) return;
 
     currentAlphaHitLinks = alphaHitLinks;
     currentLinksContainer = document.querySelector(".landing-links-container");
     lastWinner = null;
     alphaHitLinks.forEach(setupAlphaHit);
-
-    alphaHitLinks.forEach((link) => {
-      link.addEventListener("click", (e: MouseEvent) => {
-        const winner = getTopmostOpaqueLinkAt(e.clientX, e.clientY);
-        if (winner !== link) {
-          e.preventDefault();
-          if (winner) window.location.href = winner.href;
-        }
-      });
-    });
   }
 
-document.addEventListener("mousemove", (e: MouseEvent) => {
+  function handleAlphaHitClick(e: MouseEvent) {
+    const link = (e.target as Element).closest(".landing-link-alpha-hit");
+    if (!link) return;
+    const winner = getTopmostOpaqueLinkAt(e.clientX, e.clientY);
+    if (winner !== link) {
+      e.preventDefault();
+      if (winner) window.location.href = winner.href;
+    }
+  }
+
+  function handleAlphaHitMousemove(e: MouseEvent) {
     const winner = getTopmostOpaqueLinkAt(e.clientX, e.clientY);
     if (winner === lastWinner) return;
     lastWinner = winner;
-    currentAlphaHitLinks.forEach((link) => link.classList.toggle("is-over-icon", link === winner));
+    currentAlphaHitLinks.forEach((link) =>
+      link.classList.toggle("is-over-icon", link === winner),
+    );
     currentLinksContainer?.classList.toggle("is-over-icon", winner !== null);
-  });
+  }
 
-  function getTopmostOpaqueLinkAt(screenX: number, screenY: number): AlphaHitLink | null {
+  function getTopmostOpaqueLinkAt(
+    screenX: number,
+    screenY: number,
+  ): AlphaHitLink | null {
     const elements = document.elementsFromPoint(screenX, screenY);
     for (const el of elements) {
       if (!el.classList?.contains("landing-link-hitcanvas")) continue;
@@ -142,8 +151,12 @@ document.addEventListener("mousemove", (e: MouseEvent) => {
   }
 
   function setupAlphaHit(el: HTMLAnchorElement) {
-    const img = el.querySelector<HTMLImageElement>(".landing-link-image[data-alpha-hit]");
-    const canvas = el.querySelector<HTMLCanvasElement>(".landing-link-hitcanvas");
+    const img = el.querySelector<HTMLImageElement>(
+      ".landing-link-image[data-alpha-hit]",
+    );
+    const canvas = el.querySelector<HTMLCanvasElement>(
+      ".landing-link-hitcanvas",
+    );
     if (!img || !canvas) return;
 
     const ALPHA_THRESHOLD = 10;
@@ -151,7 +164,12 @@ document.addEventListener("mousemove", (e: MouseEvent) => {
     let offscreenCtx: CanvasRenderingContext2D | null = null;
     let imageLoaded = false;
 
-    function getMaxAlphaNear(displayX: number, displayY: number, displayW: number, displayH: number): number | null {
+    function getMaxAlphaNear(
+      displayX: number,
+      displayY: number,
+      displayW: number,
+      displayH: number,
+    ): number | null {
       if (!offscreen || !offscreenCtx || !imageLoaded) return null;
       const scaleX = offscreen.width / displayW;
       const scaleY = offscreen.height / displayH;
@@ -207,18 +225,38 @@ document.addEventListener("mousemove", (e: MouseEvent) => {
       imageLoaded = true;
     }
 
-    img.decode().then(initOffscreen).catch(() => {
-      imageLoaded = true;
-      img.addEventListener("load", initOffscreen, { once: true });
-    });
+    img
+      .decode()
+      .then(initOffscreen)
+      .catch(() => {
+        imageLoaded = true;
+        img.addEventListener("load", initOffscreen, { once: true });
+      });
 
     /** Check from screen coords; used when resolving topmost opaque link over overlapping icons. */
-    (el as AlphaHitLink).__alphaHitCheck = (screenX: number, screenY: number) => {
+    (el as AlphaHitLink).__alphaHitCheck = (
+      screenX: number,
+      screenY: number,
+    ) => {
       const rect = canvas.getBoundingClientRect();
-      if (screenX < rect.left || screenX >= rect.right || screenY < rect.top || screenY >= rect.bottom) return false;
-      return isOverIcon(screenX - rect.left, screenY - rect.top, rect.width, rect.height);
+      if (
+        screenX < rect.left ||
+        screenX >= rect.right ||
+        screenY < rect.top ||
+        screenY >= rect.bottom
+      )
+        return false;
+      return isOverIcon(
+        screenX - rect.left,
+        screenY - rect.top,
+        rect.width,
+        rect.height,
+      );
     };
   }
+
+  document.addEventListener("click", handleAlphaHitClick, true);
+  document.addEventListener("mousemove", handleAlphaHitMousemove);
 
   initAlphaHit();
 </script>

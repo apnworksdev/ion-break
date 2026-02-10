@@ -1,0 +1,9 @@
+# Use Node 22 to match .nvmrc (optional but recommended for consistent builds).
+[build.environment]
+NODE_VERSION = "22"
+
+# Allow Netlify Image CDN to fetch and transform images from Sanity.
+# Without this, requests to /.netlify/images?url=https://cdn.sanity.io/... return 400.
+# https://docs.netlify.com/image-cdn/overview/#remote-path
+[images]
+remote_images = ["https://cdn.sanity.io/images/.*"]
