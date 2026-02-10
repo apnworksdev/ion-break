@@ -1,6 +1,7 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import "../styles/game.css";
+export const prerender = true;
 ---
 
 <Layout title="Game - ION Break">
@@ -9,6 +10,7 @@ import "../styles/game.css";
       src="/unity/index.html"
       title="ION Break Game"
       class="game-iframe"
+      loading="lazy"
     />
   </div>
 </Layout>

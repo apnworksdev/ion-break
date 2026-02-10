@@ -2,6 +2,10 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
+# Long cache for static fonts
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
 # Unity WebGL Build: serve pre-compressed Brotli with correct encoding
 # so the browser decompresses them and startup time is reduced.
 /unity/Build/*.unityweb

@@ -1,9 +1,9 @@
 .landing-container {
-  position: fixed;
+  position: relative;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  height: 100svh;
   z-index: 1;
   pointer-events: none;
 }
@@ -21,6 +21,12 @@
   pointer-events: none;
 }
 
+@media (aspect-ratio <= 1/1) {
+  .landing-face-container {
+    top: 0;
+  }
+}
+
 .landing-face-image {
   width: auto;
   height: 100%;
@@ -28,10 +34,17 @@
   object-position: center;
 }
 
+@media (aspect-ratio <= 1/1) {
+  .landing-face-image {
+    width: 100%;
+    height: auto;
+  }
+}
+
 .landing-hands-container {
   position: absolute;
   z-index: 3;
-  top: 0;
+  bottom: 0;
   left: 0;
   width: 100%;
   height: 100%;
@@ -41,11 +54,24 @@
   pointer-events: none;
 }
 
+@media (aspect-ratio <= 1/1) {
+  .landing-hands-container {
+    bottom: -5%;
+  }
+}
+
 .landing-hands-image {
   width: auto;
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+@media (aspect-ratio <= 1/1) {
+  .landing-hands-image {
+    width: 100%;
+    height: auto;
+  }
 }
 
 .landing-links-container {
@@ -62,7 +88,7 @@
 }
 
 .landing-links-item {
-  position: absolute;
+  position: fixed;
   pointer-events: auto;
 }
 
@@ -71,25 +97,26 @@
 }
 
 .landing-link-image {
-  width: 100%;
+  width: auto;
   height: 100%;
   object-fit: cover;
   object-position: center;
 }
 
 .landing-link-text {
-  display: none;
+  opacity: 0;
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   text-align: center;
-  font-family: 'Impact MT Std', serif;
-  font-weight: bold;
-  font-size: max(3.4vh, 30px);
-  color: #14FF00;
+  font-family: var(--font-family-impact);
+  font-weight: var(--font-weight-impact);
+  font-size: var(--font-size-large);
+  color: var(--green-color);
   text-transform: uppercase;
   pointer-events: none;
+  transition: opacity var(--transition-time) var(--transition-effect);
 }
 
 .landing-links-item.game {
@@ -97,6 +124,16 @@
   bottom: 15%;
   left: calc(50% - 27vh);
   transform: translateX(-50%);
+}
+
+@media (aspect-ratio <= 1/1) {
+  .landing-links-item.game {
+    height: 80vw;
+    max-height: 650px;
+    left: 50%;
+    bottom: 19%;
+    transform: translate(-50%, 50%) rotate(-13deg);
+  }
 }
 
 .landing-links-item.game .landing-link-text {
@@ -112,6 +149,16 @@
   transform: translateX(-50%);
 }
 
+@media (aspect-ratio <= 1/1) {
+  .landing-links-item.tastes {
+    max-height: 650px;
+    height: 79vw;
+    left: 50%;
+    bottom: 39%;
+    transform: translate(-50%, 50%) rotate(39deg);
+  }
+}
+
 .landing-links-item.tastes .landing-link-text {
   top: 17%;
   left: 1.5vh;
@@ -125,11 +172,26 @@
   transform: translateX(-50%) rotate(23deg);
 }
 
+@media (aspect-ratio <= 1/1) {
+  .landing-links-item.video {
+    max-height: 650px;
+    height: 81vw;
+    left: 55%;
+    bottom: 56%;
+    transform: translate(-50%, 50%) rotate(48deg);
+  }
+}
+
 .landing-links-item.video .landing-link-text {
   top: -2%;
 }
 
-/* Link needs a box so the canvas overlay can be positioned */
+@media (aspect-ratio <= 1/1) {
+  .landing-links-item.video .landing-link-text {
+    left: -14%;
+  }
+}
+
 .landing-links-item .landing-link-link.landing-link-alpha-hit {
   display: block;
   width: 100%;
@@ -137,7 +199,6 @@
   position: relative;
 }
 
-/* Canvas overlay: same size as img, used only for alpha hit-testing */
 .landing-links-item .landing-link-hitcanvas {
   position: absolute;
   inset: 0;
@@ -147,18 +208,16 @@
   cursor: default;
 }
 
-/* Cursor follows “winner” (topmost opaque icon) via parent class, so overlapping icons work */
 .landing-links-container.is-over-icon .landing-link-hitcanvas {
   cursor: pointer;
 }
 
-/* Promote to own layer so filter paint doesn’t block; keeps border snappy */
 .landing-links-item .landing-link-image {
   will-change: filter;
   transform: translateZ(0);
+  transition: filter var(--transition-time) var(--transition-effect);
 }
 
-/* Border on hover/focus: 2 layers for minimal paint cost */
 .landing-links-item .landing-link-link.is-over-icon .landing-link-image,
 .landing-links-item .landing-link-link:focus-visible .landing-link-image {
   filter:
@@ -167,5 +226,5 @@
 
 .landing-links-item .landing-link-link.is-over-icon .landing-link-text,
 .landing-links-item .landing-link-link:focus-visible .landing-link-text {
-  display: block;
+  opacity: 1;
 }

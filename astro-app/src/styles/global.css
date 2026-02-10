@@ -64,6 +64,26 @@ body.fade-out {
   opacity: 0;
 }
 
+/* Hide main until critical images have loaded (see Layout script) */
+body.waiting-images main {
+  opacity: 0;
+  pointer-events: none;
+}
+
+body main {
+  transition: opacity 0.35s ease-out;
+}
+
+/* Fade in each image when it has loaded (avoids visible "loading" pop-in) */
+[data-app-image] img {
+  opacity: 0;
+  transition: opacity 0.25s ease-out;
+}
+
+[data-app-image] img.loaded {
+  opacity: 1;
+}
+
 ul,
 ol,
 menu {

@@ -1,4 +1,5 @@
 ---
+import AppImage from "./AppImage.astro";
 import { urlFor } from "../utils/image";
 import type { Taste } from "../utils/sanity";
 import "../styles/components.css";
@@ -7,9 +8,14 @@ interface Props {
   taste: Taste;
   currentIndex: number;
   totalCount: number;
+  priority?: boolean;
 }
 
-const { taste, currentIndex, totalCount } = Astro.props;
+const { taste, currentIndex, totalCount, priority = false } = Astro.props;
+
+const imgSrc = taste.mainImage
+  ? urlFor(taste.mainImage).width(2000).height(1600).url()
+  : "";
 ---
 
   <div class="card" data-tilt>
@@ -19,11 +25,15 @@ const { taste, currentIndex, totalCount } = Astro.props;
     
     <hover-tilt tilt-factor="1.4" scale-factor="1">
       {
-        taste.mainImage ? (
-          <img
-            class="card-cover"
-            src={urlFor(taste.mainImage).width(2000).height(1600).url()}
+        taste.mainImage && imgSrc ? (
+          <AppImage
+            src={imgSrc}
             alt={taste.mainImage.alt || ""}
+            width={2000}
+            height={1600}
+            class="card-cover"
+            loading={priority ? undefined : "lazy"}
+            fetchpriority={priority ? "high" : undefined}
           />
         ) : (
           <div class="card-cover--none" />

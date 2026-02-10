@@ -1,6 +1,9 @@
 ---
+import AppImage from "../components/AppImage.astro";
 import Layout from "../layouts/Layout.astro";
 import { getFullVideo } from '../utils/sanity';
+import hands from "../assets/images/video-hands-desktop.png";
+import mobileHands from "../assets/images/video-hands-mobile.png";
 import "../styles/video.css";
 
 const fullVideo = await getFullVideo();
@@ -25,7 +28,14 @@ const fullVideo = await getFullVideo();
         </div>
       )}
       <div class="video-hands-container">
-        <img src="/img/video-hands-desktop.png" alt="ION Break" class="video-hands-image" />
+        <AppImage
+          src={hands}
+          mobileSrc={mobileHands}
+          alt="ION Break"
+          class="video-hands-image"
+          width={1920}
+          height={1080}
+        />
       </div>
     </div>
     <div class="controls-container">

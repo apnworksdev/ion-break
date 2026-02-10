@@ -1,38 +1,94 @@
 ---
+import AppImage from "../components/AppImage.astro";
 import Layout from "../layouts/Layout.astro";
+import hero from "../assets/images/landing-face-desktop.png";
+import mobileHero from "../assets/images/landing-face-mobile.png";
+import gameIcon from "../assets/images/landing-game-icon.png";
+import tastesIcon from "../assets/images/landing-tastes-icon.png";
+import phoneIcon from "../assets/images/landing-phone-desktop.png";
+import mobilePhoneIcon from "../assets/images/landing-phone-mobile.png";
+import hands from "../assets/images/landing-hands-desktop.png";
+import mobileHands from "../assets/images/landing-hands-mobile.png";
 import "../styles/home.css";
+export const prerender = true;
 ---
 
 <Layout title="ION Break">
   <div class="landing-container">
     <div class="landing-face-container">
-      <img src="/img/landing-face-desktop.png" alt="ION Break" class="landing-face-image" />
+      <AppImage
+        src={hero}
+        mobileSrc={mobileHero}
+        alt="ION Break"
+        class="landing-face-image"
+        width={1920}
+        height={1080}
+        quality="high"
+        fetchpriority="high"
+      />
     </div>
     <div class="landing-links-container">
       <div class="landing-links-item game">
         <a href="/game" class="landing-link-link landing-link-alpha-hit">
-          <img src="/img/landing-game-icon.png" alt="Play game" class="landing-link-image" data-alpha-hit />
+          <AppImage
+            src={gameIcon}
+            alt="Play game"
+            class="landing-link-image"
+            width={800}
+            height={800}
+            quality="high"
+            fetchpriority="high"
+            data-alpha-hit
+          />
           <canvas class="landing-link-hitcanvas" aria-hidden="true"></canvas>
           <p class="landing-link-text">Play the game</p>
         </a>
       </div>
       <div class="landing-links-item tastes">
         <a href="/tastes" class="landing-link-link landing-link-alpha-hit">
-          <img src="/img/landing-tastes-icon.png" alt="Tastes" class="landing-link-image" data-alpha-hit />
+          <AppImage
+            src={tastesIcon}
+            alt="Tastes"
+            class="landing-link-image"
+            width={800}
+            height={800}
+            quality="high"
+            fetchpriority="high"
+            data-alpha-hit
+          />
           <canvas class="landing-link-hitcanvas" aria-hidden="true"></canvas>
           <p class="landing-link-text">Tastes/Fillings</p>
         </a>
       </div>
       <div class="landing-links-item video">
         <a href="/video" class="landing-link-link landing-link-alpha-hit">
-          <img src="/img/landing-phone-desktop.png" alt="Game Icon" class="landing-link-image" data-alpha-hit />
+          <AppImage
+            src={phoneIcon}
+            mobileSrc={mobilePhoneIcon}
+            alt="Watch the clip"
+            class="landing-link-image"
+            width={800}
+            height={800}
+            quality="high"
+            fetchpriority="high"
+            data-alpha-hit
+          />
           <canvas class="landing-link-hitcanvas" aria-hidden="true"></canvas>
           <p class="landing-link-text">Watch the clip</p>
         </a>
       </div>
     </div>
     <div class="landing-hands-container">
-      <img src="/img/landing-hands-desktop.png" alt="ION Break" class="landing-hands-image" />
+      <AppImage
+        src={hands}
+        mobileSrc={mobileHands}
+        alt="ION Break"
+        class="landing-hands-image"
+        width={1920}
+        height={1080}
+        quality="high"
+        fetchpriority="high"
+      />
     </div>
   </div>
 </Layout>
@@ -66,7 +122,7 @@ import "../styles/home.css";
     });
   }
 
-  document.addEventListener("mousemove", (e: MouseEvent) => {
+document.addEventListener("mousemove", (e: MouseEvent) => {
     const winner = getTopmostOpaqueLinkAt(e.clientX, e.clientY);
     if (winner === lastWinner) return;
     lastWinner = winner;

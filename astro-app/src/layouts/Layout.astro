@@ -1,5 +1,7 @@
 ---
+import AppImage from '../components/AppImage.astro';
 import { ViewTransitions } from 'astro:transitions';
+import logo from '../assets/images/logo-metallic.png';
 import '../styles/variables.css';
 import '../styles/global.css';
 import '../styles/main.css';
@@ -19,6 +21,7 @@ const { title } = Astro.props;
       name="viewport"
       content="width=device-width"
     />
+    <link rel="preconnect" href="https://cdn.sanity.io" crossorigin />
     <link
       rel="icon"
       type="image/svg+xml"
@@ -30,22 +33,99 @@ const { title } = Astro.props;
     />
 
     <title>{title}</title>
+    <slot name="head" />
     <ViewTransitions />
   </head>
-  <body>
-    <a
-      href="/"
-      id="logo-link"
-      transition:persist="logo"
-    >
-      <img
-        src="/img/logo-metallic.png"
-        alt="Sanity Logo"
-        id="logo"
-      />
-    </a>
+  <body class="waiting-images">
+    <header class="header">
+      <nav class="header-nav">
+        <a
+          href="/"
+          id="logo-link"
+          transition:persist="logo"
+        >
+          <AppImage
+            src={logo}
+            alt="ION Break"
+            id="logo"
+            width={350}
+            height={100}
+            fetchpriority="high"
+          />
+        </a>
+      </nav>
+    </header>
     <main>
       <slot />
     </main>
+    <script>
+      function markImagesLoaded() {
+        document.querySelectorAll("[data-app-image] img").forEach((img) => {
+          if ((img as HTMLImageElement).complete) {
+            img.classList.add("loaded");
+          } else {
+            img.addEventListener("load", () => img.classList.add("loaded"));
+          }
+        });
+      }
+
+      function revealWhenImagesReady() {
+        const main = document.querySelector("main");
+        if (!main) {
+          document.body.classList.remove("waiting-images");
+          return;
+        }
+        const images = main.querySelectorAll("img");
+        if (images.length === 0) {
+          document.body.classList.remove("waiting-images");
+          return;
+        }
+        const maxWait = 6000;
+        const start = Date.now();
+        let resolved = false;
+
+        function finish(fallback = false) {
+          if (resolved) return;
+          resolved = true;
+          if (fallback) {
+            document.body.classList.add("images-timeout");
+          }
+          document.body.classList.remove("waiting-images");
+        }
+
+        const check = () => {
+          if (resolved) return;
+          const done = Array.from(images).every(
+            (img) =>
+              (img as HTMLImageElement).complete ||
+              (img as HTMLImageElement).naturalWidth === 0
+          );
+          if (done) {
+            finish();
+          } else if (Date.now() - start > maxWait) {
+            finish(true);
+          } else {
+            requestAnimationFrame(check);
+          }
+        };
+
+        images.forEach((img) => {
+          const el = img as HTMLImageElement;
+          el.addEventListener("load", check);
+          el.addEventListener("error", check);
+        });
+
+        setTimeout(() => finish(true), maxWait);
+        requestAnimationFrame(check);
+      }
+
+      function initImageReveal() {
+        markImagesLoaded();
+        revealWhenImagesReady();
+      }
+
+      document.addEventListener("astro:page-load", initImageReveal);
+      initImageReveal();
+    </script>
   </body>
 </html>

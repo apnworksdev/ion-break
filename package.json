@@ -1,8 +1,10 @@
 {
   "name": "ion",
+  "engines": { "node": ">=20.0.0" },
   "description": "Minimal Astro site with Sanity Studio",
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\""
+    "dev": "concurrently \"npm run dev --workspace=astro-app\" \"npm run dev --workspace=studio\"",
+    "dev:mobile": "npm run dev:mobile --workspace=astro-app"
   },
   "keywords": [
     "Sanity",

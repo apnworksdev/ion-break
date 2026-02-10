@@ -1,8 +1,11 @@
 ---
+import AppImage from "../components/AppImage.astro";
 import Card from "../components/Card.astro";
 import Layout from "../layouts/Layout.astro";
 import { getTastes } from "../utils/sanity";
 import { Swiper, SwiperWrapper, SwiperSlide } from "astro-swiper";
+import bg from "../assets/images/tastes-background-desktop.png";
+import mobileBg from "../assets/images/tastes-background-mobile.png";
 import "../styles/tastes.css";
 
 const tastes = await getTastes();
@@ -11,7 +14,15 @@ const tastes = await getTastes();
 <Layout title="Products - ION Break">
   <div class="tastes-page">
     <div class="tastes-page-background-container">
-      <img src="/img/tastes-background-desktop.png" alt="ION Break" class="tastes-page-background-image" />
+      <AppImage
+        src={bg}
+        mobileSrc={mobileBg}
+        alt="ION Break"
+        class="tastes-page-background-image"
+        width={1920}
+        height={1080}
+        fetchpriority="high"
+      />
     </div>
     <Swiper
       options={{
@@ -38,8 +49,8 @@ const tastes = await getTastes();
         }
       }}>
       <SwiperWrapper>
-        {tastes.length ? tastes.map((taste, index) => <SwiperSlide><Card taste={taste} currentIndex={index + 1} totalCount={tastes.length} /></SwiperSlide>) : ''}
-        {tastes.length ? tastes.map((taste, index) => <SwiperSlide><Card taste={taste} currentIndex={index + 1} totalCount={tastes.length} /></SwiperSlide>) : ''}
+        {tastes.length ? tastes.map((taste, index) => <SwiperSlide><Card taste={taste} currentIndex={index + 1} totalCount={tastes.length} priority={index === 0} /></SwiperSlide>) : ''}
+        {tastes.length ? tastes.map((taste, index) => <SwiperSlide><Card taste={taste} currentIndex={index + 1} totalCount={tastes.length} priority={false} /></SwiperSlide>) : ''}
       </SwiperWrapper>
 
       <div class="swiper-button-prev">
@@ -54,139 +65,6 @@ const tastes = await getTastes();
   </div>
 </Layout>
 
-<script type="module" src="https://cdn.jsdelivr.net/npm/hover-tilt/dist/hover-tilt.js" is:inline></script>
-
-<!-- <style>
-  #clip-button {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 25vw;
-    z-index: 10;
-    transform: rotate(-15deg) translate(-8%, -10%);
-    max-width: 500px;
-  }
-
-  #clip-button-img {
-    width: 100%;
-    height: auto;
-  }
-
-  .swiper {
-    position: fixed;
-    width: 100vw;
-    height: 100dvh;
-    padding-top: 75px;
-  }
-
-  .swiper-slide {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-  }
-
-  .swiper-slide:not(.swiper-slide-active) {
-    filter: blur(5px);
-  }
-
-  .swiper-button-next,
-  .swiper-button-prev {
-    --swiper-navigation-sides-offset: -1vw;
-    --swiper-navigation-size: 18vw;
-    --swiper-navigation-top-offset: calc(50% + 20px);
-    color: #fff;
-    z-index: 90;
-    max-width: 275px;
-  }
-
-  .swiper-button-prev {
-    --swiper-navigation-sides-offset: -2vw;
-  }
-
-  .swiper-button-next svg,
-  .swiper-button-prev svg,
-  .swiper-navigation-icon {
-    display: none;
-  }
-
-  .swiper-button-next:after,
-  .swiper-button-prev:after {
-    font-size: 30px;
-  }
-
-  .arrow-prev-img,
-  .arrow-next-img {
-    width: 100%;
-  }
-
-  #ion-tag {
-    position: fixed;
-    top: 0;
-    right: 0;
-    height: 40vh;
-    transform: rotate(180deg) translate(-30%, 10%);
-    z-index: 70;
-    pointer-events: none;
-  }
-
-  #break-tag {
-    position: fixed;
-    bottom: 0;
-    right: 0;
-    width: 110vh;
-    transform: rotate(-90deg) translate(-2%, 57%);
-    z-index: 80;
-    pointer-events: none;
-  }
-
-  @media (hover: hover) {
-    .swiper-button-prev:hover img {
-      transform: rotate(5deg) scale(1.03);
-    }
-
-    .swiper-button-prev:hover:active img {
-      transform: rotate(7deg) scale(1.05);
-    }
-
-    .swiper-button-next:hover img {
-      transform: rotate(-7deg) scale(.95);
-    }
-
-    .swiper-button-next:hover:active img {
-      transform: rotate(-10deg) scale(1);
-    }
-  }
-
-  @media screen and (max-width:820px) {
-    #clip-button,
-    #ion-tag {
-      display: none;
-    }
-
-    #break-tag {
-      bottom: auto;
-      right: auto;
-      top: 0;
-      left: 0;
-      transform: rotate(-90deg) translateX(-100%);
-      transform-origin: top left;
-      width: 95dvh;
-      height: 100vw;
-      object-fit: cover;
-      z-index: -1;
-    }
-
-    .swiper-wrapper,
-    .swiper-slide {
-      position: initial;
-    }
-
-    .swiper-button-prev:active img {
-      transform: rotate(7deg) scale(1.05);
-    }
-
-    .swiper-button-next:active img {
-      transform: rotate(-10deg) scale(1);
-    }
-  }
-</style> -->
+<script>
+  import 'hover-tilt/web-component';
+</script>

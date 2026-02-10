@@ -7,4 +7,13 @@
   --font-family-lab-grotesque-mono: 'Lab Grotesque Mono', monospace;
   --font-weight-lab-grotesque-mono: normal;
   --font-size-large: max(3.4vh, 30px);
+
+  --transition-time: 0.3s;
+  --transition-effect: ease;
+}
+
+@media (aspect-ratio <= 1/1) {
+  :root {
+    --font-size-large: 24px;
+  }
 }

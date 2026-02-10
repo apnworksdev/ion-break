@@ -17,11 +17,24 @@
   pointer-events: none;
 }
 
+@media (aspect-ratio <= 1/1) {
+  .tastes-page-background-container {
+    align-items: center;
+  }
+}
+
 .tastes-page-background-image {
   width: auto;
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+@media (aspect-ratio <= 1/1) {
+  .tastes-page-background-image {
+    width: 100%;
+    height: auto;
+  }
 }
 
 .tastes-page .swiper {
@@ -57,6 +70,13 @@
   cursor: pointer;
   z-index: 10;
   --swiper-navigation-sides-offset: 23px;
+}
+
+@media (aspect-ratio <= 1/1) {
+  .tastes-page .swiper-button-prev,
+  .tastes-page .swiper-button-next {
+    --swiper-navigation-sides-offset: 10px;
+  }
 }
 
 .tastes-page .swiper-button-prev,
@@ -98,12 +118,55 @@
   top: 50%;
 }
 
+.tastes-page .swiper-slide:not(.swiper-slide-active) .card-description-container,
+.tastes-page .swiper-slide:not(.swiper-slide-active) .card-title {
+  opacity: 0;
+}
+
+.tastes-page .swiper-slide:not(.swiper-slide-active) .card-cover {
+  transform: scale(.7);
+}
+
+.tastes-page .swiper-slide.swiper-slide-active .card-cover {
+  transform: rotate(4deg);
+}
+
+.tastes-page .swiper-slide:not(.swiper-slide-active) hover-tilt {
+  pointer-events: none;
+}
+
+.tastes-page .swiper-navigation-icon {
+  display: none;
+}
+
+@media (aspect-ratio <= 1/1) {
+  .tastes-page .swiper-slide.swiper-slide-active {
+    z-index: 1;
+  }
+
+  .tastes-page .swiper-slide:not(.swiper-slide-active) .card-cover {
+    max-width: 250px;
+    transform: scale(1.7);
+  }
+
+  .tastes-page .swiper-slide.swiper-slide-active .card-cover {
+    max-width: 300px;
+    transform: scale(2.3);
+  }
+}
+
 .back-button {
   position: fixed;
   top: 20px;
   left: 23px;
   z-index: 10;
   cursor: pointer;
+}
+
+@media (aspect-ratio <= 1/1) {
+  .back-button {
+    display: none;
+  }
 }
 
 .back-button-text {
