@@ -8,10 +8,10 @@ import '../styles/main.css';
 
 interface Props {
   title: string;
-  hideHeaderInLandscape?: boolean;
+  hideHeader?: boolean;
 }
 
-const { title, hideHeaderInLandscape = false } = Astro.props;
+const { title, hideHeader = false } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -38,7 +38,7 @@ const { title, hideHeaderInLandscape = false } = Astro.props;
     <ViewTransitions />
   </head>
   <body>
-    <header class="header" data-hide-in-landscape={hideHeaderInLandscape || undefined}>
+    <header class="header" data-hide={hideHeader || undefined}>
       <nav class="header-nav">
         <a
           href="/"

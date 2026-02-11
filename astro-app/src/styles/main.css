@@ -44,6 +44,10 @@ html {
   width: 350px;
 }
 
+.header[data-hide] {
+  display: none;
+}
+
 @media (aspect-ratio <= 1/1) {
   .header {
     width: max(23vw, 190px);
@@ -76,9 +80,5 @@ html {
 @media (orientation: landscape) and (max-width: 1024px) {
   .header {
     width: max(23vw, 190px);
-  }
-
-  .header[data-hide-in-landscape] {
-    display: none;
   }
 }

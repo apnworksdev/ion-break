@@ -100,11 +100,11 @@
       const loadingHandle = document.querySelector("#loading-handle");
 
       const buildUrl = "Build";
-      const loaderUrl = buildUrl + "/FINAL 03.loader.js";
+      const loaderUrl = buildUrl + "/FINAL 07 WEBQUIT.loader.js";
       const config = {
-        dataUrl: buildUrl + "/FINAL 03.data.unityweb",
-        frameworkUrl: buildUrl + "/FINAL 03.framework.js.unityweb",
-        codeUrl: buildUrl + "/FINAL 03.wasm.unityweb",
+        dataUrl: buildUrl + "/FINAL 07 WEBQUIT.data.unityweb",
+        frameworkUrl: buildUrl + "/FINAL 07 WEBQUIT.framework.js.unityweb",
+        codeUrl: buildUrl + "/FINAL 07 WEBQUIT.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "GetSomeSleep",
         productName: "NMR",
@@ -202,62 +202,130 @@
         toolbarOverlay.style.display = show ? "flex" : "none";
       }
 
-      // --- iOS Audio Unlock -----------------------------------------------------
-      let audioUnlocked = false;
+     
+ // --- iOS Audio Unlock -----------------------------------------------------
+let lastMediaAttempt = 0;
+let mediaUnlockedOnce = false;
 
-      function tryUnlockIOSAudio() {
-        if (audioUnlocked) return;
+function getUnityAudioContext() {
+  try {
+    return (
+      (window.unityInstance &&
+        window.unityInstance.Module &&
+        window.unityInstance.Module.audioContext) ||
+      (window.Module && window.Module.audioContext) ||
+      null
+    );
+  } catch (e) {
+    return null;
+  }
+}
 
-        let resumed = false;
+function unlockViaAudioContext() {
+  const ctx = getUnityAudioContext();
+  if (!ctx) return false;
 
-        try {
-          const ctx =
-            (window.unityInstance &&
-              window.unityInstance.Module &&
-              window.unityInstance.Module.audioContext) ||
-            (window.Module && window.Module.audioContext);
+  try {
+    if (ctx.state === "suspended" && typeof ctx.resume === "function") {
+      ctx.resume();
+    }
+    return ctx.state === "running";
+  } catch (e) {
+    return false;
+  }
+}
 
-          if (ctx && ctx.state === "suspended" && typeof ctx.resume === "function") {
-            ctx.resume();
-            resumed = true;
-          } else if (ctx && ctx.state === "running") {
-            resumed = true;
-          }
-        } catch (e) {
-          // silently ignore
-        }
+// Throttled + "keep alive briefly" silent media element.
+// This helps newest iPhones where volume buttons / media route need an active media session.
+function unlockViaSilentMediaElementThrottled() {
+  const now = Date.now();
 
-        if (resumed) audioUnlocked = true;
-      }
+  // Before first success, allow attempts more frequently.
+  // After success, back off so it stays cheap.
+  const cooldownMs = mediaUnlockedOnce ? 5000 : 1500;
+  if (now - lastMediaAttempt < cooldownMs) return Promise.resolve(false);
+  lastMediaAttempt = now;
 
-      // Fallback: first user interaction anywhere unlocks audio (iOS Safari)
-      document.addEventListener(
-        "touchstart",
-        () => {
-          if (isIOSMobileDevice()) tryUnlockIOSAudio();
-        },
-        { passive: true, once: true }
-      );
-      document.addEventListener(
-        "pointerdown",
-        () => {
-          if (isIOSMobileDevice()) tryUnlockIOSAudio();
-        },
-        { passive: true, once: true }
-      );
+  return new Promise((resolve) => {
+    const a = document.createElement("audio");
+    a.src = "TemplateData/silence.mp3";
+    a.preload = "auto";
+    a.playsInline = true;
 
-      // Tap anywhere to dismiss toolbar overlay (also unlocks iOS audio)
-      if (toolbarOverlay) {
-        const onTap = () => {
-          tryUnlockIOSAudio(); // silent unlock
-          showToolbarOverlay(false);
-        };
+    // Must be > 0 on iOS sometimes
+    a.volume = 0.01;
 
-        toolbarOverlay.addEventListener("pointerdown", onTap, { passive: true });
-        toolbarOverlay.addEventListener("touchstart", onTap, { passive: true });
-        toolbarOverlay.addEventListener("mousedown", onTap);
-      }
-      // --------------------------------------------------------------------------
+    // Loop briefly so iOS treats this as active media playback
+    a.loop = true;
+
+    const stop = () => {
+      try { a.pause(); } catch {}
+      try { a.currentTime = 0; } catch {}
+      a.src = ""; // help GC
+      resolve(true);
+    };
+
+    const p = a.play();
+    if (p && typeof p.then === "function") {
+      p.then(() => {
+        mediaUnlockedOnce = true;
+        setTimeout(stop, 1200); // keep alive ~1.2s
+      }).catch(() => {
+        resolve(false);
+      });
+    } else {
+      mediaUnlockedOnce = true;
+      setTimeout(stop, 1200);
+    }
+  });
+}
+
+async function tryUnlockIOSAudio() {
+  if (!isIOSMobileDevice()) return;
+
+  // Always attempt: volume could have been 0, user could have changed it,
+  // iOS could have suspended audio in the background, etc.
+  unlockViaAudioContext();
+  await unlockViaSilentMediaElementThrottled();
+}
+
+// Listen broadly; iOS may only treat some events as valid gestures depending on context
+document.addEventListener("touchstart", tryUnlockIOSAudio, { passive: true });
+document.addEventListener("pointerdown", tryUnlockIOSAudio, { passive: true });
+document.addEventListener("click", tryUnlockIOSAudio, { passive: true });
+
+(function () {
+  const events = ["click", "pointerdown", "touchstart"];
+
+  function requestParentFullscreen() {
+    if (window.parent !== window) window.parent.postMessage({ type: "REQUEST_FULLSCREEN" }, "*");
+    events.forEach((ev) => document.removeEventListener(ev, requestParentFullscreen));
+  }
+
+  events.forEach((ev) => document.addEventListener(ev, requestParentFullscreen, { passive: true }));
+})();
+
+// Re-kick audio when returning to the page (common iOS gotcha)
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) tryUnlockIOSAudio();
+});
+window.addEventListener("pageshow", () => tryUnlockIOSAudio());
+
+// Your toolbar overlay tap also triggers unlock + dismiss
+if (toolbarOverlay) {
+  const onTap = () => {
+    tryUnlockIOSAudio();
+    showToolbarOverlay(false);
+  };
+
+  toolbarOverlay.addEventListener("pointerdown", onTap, { passive: true });
+  toolbarOverlay.addEventListener("touchstart", onTap, { passive: true });
+  toolbarOverlay.addEventListener("mousedown", onTap);
+}
+// --------------------------------------------------------------------------
+
+
+
 
       function handleIOSGating() {
         const ios = isIOSMobileDevice();

@@ -4,8 +4,8 @@ import "../styles/game.css";
 export const prerender = true;
 ---
 
-<Layout title="Game - ION Break" hideHeaderInLandscape>
-  <div class="game-page">
+<Layout title="Game - ION Break" hideHeader>
+  <div class="game-page" id="game-container">
     <iframe
       src="/unity/index.html"
       title="ION Break Game"
@@ -14,3 +14,22 @@ export const prerender = true;
     />
   </div>
 </Layout>
+
+<script>
+  document.addEventListener('astro:page-load', () => {
+    const container = document.getElementById('game-container');
+    
+    window.addEventListener("message", function (event) {
+
+      if (!event.data || typeof event.data !== "object" || !event.data.type) return;
+      console.log(event.data);
+
+      if (event.data.type === "QUIT_TO_HOME") {
+        window.location.href = "/";
+      }
+      if (event.data.type === "REQUEST_FULLSCREEN" && container) {
+        container.requestFullscreen?.()?.catch(() => {});
+      }
+    });
+  });
+</script>
