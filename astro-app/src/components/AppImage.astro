@@ -4,7 +4,6 @@
  *
  * - With mobileSrc/mobileSrcSet: uses one <picture> with mobile source at (max-width: 820px), then avif + webp for desktop, then img fallback.
  * - Mobile ImageMetadata is passed through getImage() so the built URL is correct (same as desktop).
- * - Wrapper has data-app-image for fade-in and reveal-when-ready.
  */
 import { getImage, Picture } from "astro:assets";
 import type { ImageMetadata } from "astro";
@@ -92,7 +91,7 @@ if (hasMobile) {
 const useCustomPicture = hasMobile;
 ---
 
-<div class="app-image" data-app-image>
+<div class="app-image">
   {useCustomPicture ? (
     <picture>
       {mobileSrcUrl && (
