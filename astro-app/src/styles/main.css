@@ -72,3 +72,13 @@ html {
     filter: drop-shadow(0 0 5px var(--green-color));
   }
 }
+
+@media (orientation: landscape) and (max-width: 1024px) {
+  .header {
+    width: max(23vw, 190px);
+  }
+
+  .header[data-hide-in-landscape] {
+    display: none;
+  }
+}
