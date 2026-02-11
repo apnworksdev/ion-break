@@ -28,7 +28,7 @@ hover-tilt {
 }
 
 .card-cover {
-  width: 45vw;
+  width: 37vw;
   max-width: 900px;
   height: auto;
   transition: transform var(--transition-time) var(--transition-effect), filter var(--transition-time) var(--transition-effect), opacity var(--transition-time) var(--transition-effect) !important;
