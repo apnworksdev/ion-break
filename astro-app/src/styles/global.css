@@ -68,7 +68,10 @@ button,
 fieldset,
 textarea {
   all: unset;
+  -webkit-tap-highlight-color: transparent;
 }
+
+
 
 a,
 button {

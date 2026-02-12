@@ -59,5 +59,33 @@ const { title, hideHeader = false } = Astro.props;
     <main>
       <slot />
     </main>
+    <script>
+      document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+          screen.orientation?.unlock?.();
+        }
+      });
+
+      document.addEventListener('click', async (e) => {
+        const target = e.target instanceof Element ? e.target : null;
+        const link = target?.closest('a[href="/game"]');
+        if (!link) return;
+        if (e.ctrlKey || e.metaKey || e.button !== 0) return;
+        const el = document.documentElement as HTMLElement & Record<string, unknown>;
+        const req = el.requestFullscreen ?? el.webkitRequestFullscreen ?? el.mozRequestFullScreen ?? el.msRequestFullscreen;
+        try {
+          if (typeof req === 'function') await req.call(el);
+        } catch (error) {
+          console.error("Failed to request fullscreen:", error);
+        }
+        // 2️⃣ LOCK TO LANDSCAPE
+        try {
+          const lock = (screen.orientation as { lock?: (mode: string) => Promise<void> })?.lock;
+          if (lock) await lock.call(screen.orientation, 'landscape');
+        } catch (err) {
+          console.warn('Orientation lock failed:', err);
+        }
+      }, true);
+    </script>
   </body>
 </html>

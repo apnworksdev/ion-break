@@ -96,6 +96,12 @@
   position: absolute;
   inset: 0;
   pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  user-drag: none;
+  user-select: none;
+  outline: none;
 }
 
 .landing-links-item.game .landing-link-link {
@@ -141,6 +147,16 @@
   .landing-link-link:hover + .landing-link-image-container .landing-link-image {
     filter: drop-shadow(0 0 16px rgba(21, 255, 0, 1));
   }
+}
+
+.landing-link-link:focus-visible + .landing-link-image-container .landing-link-text,
+.landing-link-link:focus + .landing-link-image-container .landing-link-text {
+  opacity: 1;
+}
+
+.landing-link-link:focus-visible + .landing-link-image-container .landing-link-image,
+.landing-link-link:focus + .landing-link-image-container .landing-link-image {
+  filter: drop-shadow(0 0 16px rgba(21, 255, 0, 1));
 }
 
 .landing-link-text {

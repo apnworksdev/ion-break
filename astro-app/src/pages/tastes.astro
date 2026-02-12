@@ -49,8 +49,8 @@ const tastes = await getTastes();
         }
       }}>
       <SwiperWrapper>
-        {tastes.length ? tastes.map((taste, index) => <SwiperSlide><Card taste={taste} currentIndex={index + 1} totalCount={tastes.length} priority={index === 0} /></SwiperSlide>) : ''}
-        {tastes.length ? tastes.map((taste, index) => <SwiperSlide><Card taste={taste} currentIndex={index + 1} totalCount={tastes.length} priority={false} /></SwiperSlide>) : ''}
+        {tastes.length ? tastes.map((taste, index) => <SwiperSlide><Card taste={taste} currentIndex={index + 1} totalCount={tastes.length} priority={index === 0} eager /></SwiperSlide>) : ''}
+        {tastes.length ? tastes.map((taste, index) => <SwiperSlide><Card taste={taste} currentIndex={index + 1} totalCount={tastes.length} eager /></SwiperSlide>) : ''}
       </SwiperWrapper>
 
       <div class="swiper-button-prev">

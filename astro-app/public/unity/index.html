@@ -100,11 +100,11 @@
       const loadingHandle = document.querySelector("#loading-handle");
 
       const buildUrl = "Build";
-      const loaderUrl = buildUrl + "/FINAL 07 WEBQUIT.loader.js";
+      const loaderUrl = buildUrl + "/FINAL 08 DXT.loader.js";
       const config = {
-        dataUrl: buildUrl + "/FINAL 07 WEBQUIT.data.unityweb",
-        frameworkUrl: buildUrl + "/FINAL 07 WEBQUIT.framework.js.unityweb",
-        codeUrl: buildUrl + "/FINAL 07 WEBQUIT.wasm.unityweb",
+        dataUrl: buildUrl + "/FINAL 08 DXT.data.unityweb",
+        frameworkUrl: buildUrl + "/FINAL 08 DXT.framework.js.unityweb",
+        codeUrl: buildUrl + "/FINAL 08 DXT.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "GetSomeSleep",
         productName: "NMR",
@@ -293,17 +293,6 @@ async function tryUnlockIOSAudio() {
 document.addEventListener("touchstart", tryUnlockIOSAudio, { passive: true });
 document.addEventListener("pointerdown", tryUnlockIOSAudio, { passive: true });
 document.addEventListener("click", tryUnlockIOSAudio, { passive: true });
-
-(function () {
-  const events = ["click", "pointerdown", "touchstart"];
-
-  function requestParentFullscreen() {
-    if (window.parent !== window) window.parent.postMessage({ type: "REQUEST_FULLSCREEN" }, "*");
-    events.forEach((ev) => document.removeEventListener(ev, requestParentFullscreen));
-  }
-
-  events.forEach((ev) => document.addEventListener(ev, requestParentFullscreen, { passive: true }));
-})();
 
 // Re-kick audio when returning to the page (common iOS gotcha)
 document.addEventListener("visibilitychange", () => {

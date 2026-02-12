@@ -9,9 +9,11 @@ interface Props {
   currentIndex: number;
   totalCount: number;
   priority?: boolean;
+  /** Use eager loading (required for carousels on iOS - lazy loading breaks in Swiper) */
+  eager?: boolean;
 }
 
-const { taste, currentIndex, totalCount, priority = false } = Astro.props;
+const { taste, currentIndex, totalCount, priority = false, eager = false } = Astro.props;
 
 const imgSrc = taste.mainImage
   ? urlFor(taste.mainImage).width(2000).height(1600).url()
@@ -32,8 +34,8 @@ const imgSrc = taste.mainImage
             width={2000}
             height={1600}
             class="card-cover"
-            loading={priority ? undefined : "lazy"}
-            fetchpriority={priority ? "high" : undefined}
+            loading={eager || priority ? "eager" : "lazy"}
+            fetchpriority={eager || priority ? "high" : undefined}
           />
         ) : (
           <div class="card-cover--none" />

@@ -146,12 +146,12 @@
 
   .tastes-page .swiper-slide:not(.swiper-slide-active) .card-cover {
     max-width: 250px;
-    transform: scale(1.7);
+    transform: scale(1.5);
   }
 
   .tastes-page .swiper-slide.swiper-slide-active .card-cover {
     max-width: 300px;
-    transform: scale(2.3);
+    transform: scale(2.1);
   }
 }
 

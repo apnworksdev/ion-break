@@ -17,19 +17,14 @@ export const prerender = true;
 
 <script>
   document.addEventListener('astro:page-load', () => {
-    const container = document.getElementById('game-container');
-    
-    window.addEventListener("message", function (event) {
+    window.addEventListener("message", async function (event) {
 
       if (!event.data || typeof event.data !== "object" || !event.data.type) return;
-      console.log(event.data);
 
       if (event.data.type === "QUIT_TO_HOME") {
         window.location.href = "/";
       }
-      if (event.data.type === "REQUEST_FULLSCREEN" && container) {
-        container.requestFullscreen?.()?.catch(() => {});
-      }
+
     });
   });
 </script>

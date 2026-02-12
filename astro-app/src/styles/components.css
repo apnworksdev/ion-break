@@ -8,7 +8,7 @@ hover-tilt {
   align-items: center;
   width: 50vw;
   max-width: 500px;
-  gap: 20px;
+  gap: 35px;
 }
 
 .card-title,
@@ -28,8 +28,8 @@ hover-tilt {
 }
 
 .card-cover {
-  width: 37vw;
-  max-width: 900px;
+  width: 35vw;
+  max-width: 750px;
   height: auto;
   transition: transform var(--transition-time) var(--transition-effect), filter var(--transition-time) var(--transition-effect), opacity var(--transition-time) var(--transition-effect) !important;
 }
@@ -53,7 +53,7 @@ hover-tilt {
     width: 100%;
     position: absolute;
     top: 16%;
-    left: -30vw;
+    left: -25vw;
     width: 100vw;
     height: auto;
     padding: 16px;
@@ -75,5 +75,11 @@ hover-tilt {
 
   .card-description {
     text-align: center;
+  }
+}
+
+@media (max-width: 820px) {
+  .card-title {
+    left: -30vw;
   }
 }
