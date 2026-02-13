@@ -10,21 +10,28 @@ const fullVideo = await getFullVideo();
 ---
 
 <Layout title="Video - ION Break">
-  <div class="video-page">
+  <div id="video-page" class="video-page age-overlay-visible">
     <div class="video-container">
       {fullVideo && (fullVideo.videoFile || fullVideo.videoUrl) && (
         <div class="video-wrapper">
           <video
             id="full-video"
             class="full-video"
-            autoplay
-            muted
             loop
             playsinline
             poster={fullVideo.posterImage}
           >
             <source src={fullVideo.videoUrl || fullVideo.videoFile} type="video/mp4" />
           </video>
+          <div id="age-overlay" class="video-overlay age-overlay">
+            <div class="age-overlay-content">
+              <p class="age-overlay-text">Are you 18+ years old?</p>
+              <div class="age-overlay-buttons">
+                <a href="/" class="age-overlay-button age-overlay-button-exit">Exit</a>
+                <button id="age-confirm-button" class="age-overlay-button age-overlay-button-proceed">Proceed</button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
       <div class="video-hands-container">
@@ -42,7 +49,7 @@ const fullVideo = await getFullVideo();
       <a href="/" class="back-button"><span class="back-button-text">Close</span></a>
       <div class="video-buttons-container">
         <button id="video-play-button" class="video-button" aria-label="Play/Pause Video">Play / Pause</button>
-        <button id="video-mute-button" class="video-button" aria-label="Mute/Unmute Video">Unmute</button>
+        <button id="video-mute-button" class="video-button" aria-label="Mute/Unmute Video">Mute</button>
       </div>
     </div>
   </div>
@@ -51,6 +58,20 @@ const fullVideo = await getFullVideo();
 <script is:inline>
   document.addEventListener('astro:page-load', () => {
     const video = document.getElementById('full-video');
+    const ageOverlay = document.getElementById('age-overlay');
+    const ageConfirmButton = document.getElementById('age-confirm-button');
+    const videoPage = document.getElementById('video-page');
+
+    if (ageOverlay && ageConfirmButton && videoPage) {
+      ageConfirmButton.onclick = () => {
+        ageOverlay.classList.add('age-overlay-hidden');
+        videoPage.classList.remove('age-overlay-visible');
+        if (video) {
+          video.play();
+        }
+      };
+    }
+
     if (video) {
 
       video.onclick = () => {
