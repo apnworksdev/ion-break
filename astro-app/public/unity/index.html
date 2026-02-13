@@ -100,11 +100,11 @@
       const loadingHandle = document.querySelector("#loading-handle");
 
       const buildUrl = "Build";
-      const loaderUrl = buildUrl + "/FINAL 08 DXT.loader.js";
+      const loaderUrl = buildUrl + "/FINAL 09 Fullscreen.loader.js";
       const config = {
-        dataUrl: buildUrl + "/FINAL 08 DXT.data.unityweb",
-        frameworkUrl: buildUrl + "/FINAL 08 DXT.framework.js.unityweb",
-        codeUrl: buildUrl + "/FINAL 08 DXT.wasm.unityweb",
+        dataUrl: buildUrl + "/FINAL 09 Fullscreen.data.unityweb",
+        frameworkUrl: buildUrl + "/FINAL 09 Fullscreen.framework.js.unityweb",
+        codeUrl: buildUrl + "/FINAL 09 Fullscreen.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "GetSomeSleep",
         productName: "NMR",
@@ -176,6 +176,36 @@
           })
             .then((instance) => {
               window.unityInstance = instance;
+// ───────────────────────────────────────────────────────────
+// RECEIVE FULLSCREEN STATE FROM PARENT WINDOW
+// ───────────────────────────────────────────────────────────
+
+window.addEventListener('message', function(event) {
+  
+  // Receive fullscreen state changes from parent window
+  if (event.data && event.data.type === 'FULLSCREEN_STATE_UPDATE') {
+    const state = event.data.state;
+    console.log(`[Unity WebGL] Received fullscreen state: ${state}`);
+    
+    // Send to Unity game instance
+    if (typeof unityInstance !== 'undefined' && unityInstance !== null) {
+      try {
+        unityInstance.SendMessage(
+          'GameManager',                    // GameObject name
+          'OnFullscreenStateChanged',       // Method name (WebGLFullscreenManager)
+          state                             // 'true' or 'false'
+        );
+        console.log(`[Unity WebGL]  Forwarded to Unity: ${state}`);
+      } catch (e) {
+        console.error('[Unity WebGL]  Failed to send to Unity:', e);
+      }
+    } else {
+      console.warn('[Unity WebGL]  Unity instance not ready yet');
+    }
+  }
+  
+}, false);
+
               showGame();
             })
             .catch((message) => {

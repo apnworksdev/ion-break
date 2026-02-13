@@ -11,3 +11,9 @@
   height: 100%;
   border: none;
 }
+
+/* Pause iframe when screen locks or tab hidden */
+#gameFrame.paused {
+  visibility: hidden;
+  pointer-events: none;
+}

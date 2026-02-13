@@ -7,6 +7,7 @@ export const prerender = true;
 <Layout title="Game - ION Break" hideHeader>
   <div class="game-page" id="game-container">
     <iframe
+      id="gameFrame"
       src="/unity/index.html"
       title="ION Break Game"
       class="game-iframe"
@@ -17,14 +18,95 @@ export const prerender = true;
 
 <script>
   document.addEventListener('astro:page-load', () => {
-    window.addEventListener("message", async function (event) {
+    const gameFrame = document.getElementById('gameFrame') as HTMLIFrameElement | null;
 
-      if (!event.data || typeof event.data !== "object" || !event.data.type) return;
+    // 1. Pause game only when tab is hidden or app backgrounded (not on window blur)
+    // Avoid blur/focus: they fire when clicking into the iframe, which would hide the game.
+    function pauseIframe() {
+      if (!gameFrame) return;
+      gameFrame.classList.add('paused');
+    }
 
-      if (event.data.type === "QUIT_TO_HOME") {
-        window.location.href = "/";
-      }
+    function resumeIframe() {
+      if (!gameFrame) return;
+      gameFrame.classList.remove('paused');
+    }
 
+    document.addEventListener('visibilitychange', () => {
+      document.hidden ? pauseIframe() : resumeIframe();
     });
+    // Mobile: lock screen or app switch often fires these
+    window.addEventListener('pagehide', pauseIframe);
+    window.addEventListener('pageshow', resumeIframe);
+
+    // 2. Fullscreen helpers (vendor-prefixed for older browsers)
+    const doc = document as Document & { webkitFullscreenElement?: Element; mozFullScreenElement?: Element; msFullscreenElement?: Element; webkitExitFullscreen?: () => Promise<void>; mozCancelFullScreen?: () => Promise<void>; msExitFullscreen?: () => Promise<void> };
+    const docEl = document.documentElement as HTMLElement & { webkitRequestFullscreen?: () => Promise<void>; mozRequestFullScreen?: () => Promise<void>; msRequestFullscreen?: () => Promise<void> };
+
+    function isFullscreen() {
+      return !!(doc.fullscreenElement ?? doc.webkitFullscreenElement ?? doc.mozFullScreenElement ?? doc.msFullscreenElement);
+    }
+
+    async function enterFullscreen() {
+      try {
+        if (docEl.requestFullscreen) await docEl.requestFullscreen();
+        else if (docEl.webkitRequestFullscreen) await docEl.webkitRequestFullscreen();
+        else if (docEl.mozRequestFullScreen) await docEl.mozRequestFullScreen();
+        else if (docEl.msRequestFullscreen) await docEl.msRequestFullscreen();
+      } catch (err) {
+        console.warn('[Parent] Fullscreen request failed:', err);
+      }
+    }
+
+    async function exitFullscreen() {
+      try {
+        if (document.exitFullscreen) await document.exitFullscreen();
+        else if (doc.webkitExitFullscreen) await doc.webkitExitFullscreen();
+        else if (doc.mozCancelFullScreen) await doc.mozCancelFullScreen();
+        else if (doc.msExitFullscreen) await doc.msExitFullscreen();
+      } catch (err) {
+        console.warn('[Parent] Exit fullscreen failed:', err);
+      }
+    }
+
+    async function toggleFullscreen() {
+      isFullscreen() ? await exitFullscreen() : await enterFullscreen();
+    }
+
+    // 3. Messages from Unity (fullscreen & quit)
+    const allowedOrigin = window.location.origin;
+    window.addEventListener('message', async (event) => {
+      if (event.origin !== allowedOrigin || !event.data?.type) return;
+      const { type } = event.data;
+
+      if (type === 'TOGGLE_FULLSCREEN') await toggleFullscreen();
+      else if (type === 'REQUEST_FULLSCREEN') await enterFullscreen();
+      else if (type === 'EXIT_FULLSCREEN') await exitFullscreen();
+      else if (type === 'QUIT_TO_HOME') {
+        await exitFullscreen();
+        screen.orientation?.unlock?.();
+        window.location.href = '/';
+      }
+    });
+
+    // 4. Notify Unity when fullscreen state changes (F11, ESC, etc.)
+    function notifyUnityFullscreenState() {
+      const fullscreen = isFullscreen();
+      if (gameFrame?.contentWindow) {
+        try {
+          gameFrame.contentWindow.postMessage(
+            { type: 'FULLSCREEN_STATE_UPDATE', state: fullscreen ? 'true' : 'false' },
+            allowedOrigin
+          );
+        } catch (e) {
+          console.error('[Parent] Failed to notify Unity:', e);
+        }
+      }
+    }
+
+    document.addEventListener('fullscreenchange', notifyUnityFullscreenState);
+    document.addEventListener('webkitfullscreenchange', notifyUnityFullscreenState);
+    document.addEventListener('mozfullscreenchange', notifyUnityFullscreenState);
+    document.addEventListener('msfullscreenchange', notifyUnityFullscreenState);
   });
 </script>
