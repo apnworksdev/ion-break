@@ -6,7 +6,30 @@
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Unity WebGL Build: serve pre-compressed Brotli with correct encoding
-# so the browser decompresses them and startup time is reduced.
+# Long cache for images (root favicon + any future /img or /images folders)
+/favicon.png
+/img/*
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unity WebGL Build: long cache so returning users don't re-download ~56MB
+/unity/Build/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unity .unityweb assets are Brotli-compressed by the Unity build; browser needs this to decompress
 /unity/Build/*.unityweb
   Content-Encoding: br
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unity template assets (loading screen, icons, etc.)
+/unity/TemplateData/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Unity HTML/JS/manifest (cache 1 year; bump build version when you redeploy Unity)
+/unity/*.html
+/unity/*.js
+/unity/*.webmanifest
+  Cache-Control: public, max-age=31536000, immutable
+
+/unity/StreamingAssets/*
+  Cache-Control: public, max-age=31536000, immutable
