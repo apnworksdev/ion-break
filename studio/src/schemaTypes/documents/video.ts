@@ -75,7 +75,7 @@ export default defineType({
   ],
   preview: {
     prepare: () => ({
-      title: 'Tastes'
+      title: 'Video'
     })
   }
 })
